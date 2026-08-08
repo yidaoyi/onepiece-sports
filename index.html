@@ -457,9 +457,19 @@
 	            $('resultTime').innerText = `用时：${formatTime(seconds)}`;
 	            $('resultAction').innerText = `动作次数：${stepCount} 次`;
 	            $('resultReward').innerText = `获得磁力：+${totalReward} ⚡`;
+	            reportWorkout(currentType, stepCount, seconds);
 	            $('resultModal').style.display = 'flex';
 	            feedbackMsg.innerText = `修炼结束！共获得 ${totalReward} ⚡`;
 	        });
+	        async function reportWorkout(type, count, seconds) {
+	            try {
+	                await fetch('/.netlify/functions/stats', {
+	                    method: 'POST',
+	                    headers: { 'Content-Type': 'application/json' },
+	                    body: JSON.stringify({ type, count, seconds }),
+	                });
+	            } catch (e) { /* 记录失败不影响游戏进行 */ }
+	        }
 	        function handleWalkInput() {
 	            let remaining = 500 - walkEnergyToday;
 	            if (remaining <= 0) { alert("今日散步磁力已刷满(500⚡)！"); return; }
@@ -474,6 +484,7 @@
 	            $('resultTime').innerText = `输入步数：${steps} 步`;
 	            $('resultAction').innerText = `汇率折算：10步 = 1⚡`;
 	            $('resultReward').innerText = `获得磁力：+${gainedEnergy} ⚡\n(今日剩余：${500 - walkEnergyToday}⚡)`;
+	            reportWorkout('walk', steps, 0);
 	            $('resultModal').style.display = 'flex';
 	        }
 	        window.closeModal = () => $('resultModal').style.display = 'none';

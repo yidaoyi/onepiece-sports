@@ -10,12 +10,15 @@
 | `netlify.toml` | Netlify 构建配置（函数目录 + 静态站点根目录） |
 | `netlify/functions/chat.js` | 智谱 AI 对话代理（`/.netlify/functions/chat`） |
 | `netlify/functions/remind.js` | 每日运动提醒（Server酱 推送微信，`/.netlify/functions/remind`） |
+| `netlify/functions/stats.js` | 锻炼记录存取（Netlify Blobs 持久化，`/.netlify/functions/stats`） |
+| `package.json` | 函数依赖声明（`@netlify/blobs` 用于存储锻炼记录） |
 
 ## 功能介绍
 
-- **9 位船员教练**：路飞、索隆、娜美、乌索普、山治、乔巴、罗宾、弗兰奇、布鲁克按星期轮流出场，每天由一位船员用他/她的风格喊你运动。
+- **9 位船员教练**：路飞、索隆、娜美、乌索普、山治、乔巴、罗宾、弗兰奇、布鲁克按星期轮流出场，每位船员都有专属人设（system）和开场方式（user），每天由一位船员用他/她的风格喊你运动。
 - **对话交互**：页面通过 `chat` 函数调用智谱 AI（`glm-4-flash`），让船员角色和你聊天、陪你打卡。
-- **微信提醒**：`remind` 函数每天生成角色风格的运动提醒，通过 Server酱 推送到微信，并附上运动记录页链接。
+- **微信提醒**：`remind` 函数每天生成角色风格的运动提醒，通过 Server酱 推送到微信，并附上运动记录页链接。提醒会读取你在小游戏里记录的真实锻炼情况（锻炼次数、项目、连续天数），让船员像朋友一样聊到你的实际运动，而不是空喊口号。
+- **锻炼记录**：每次在页面完成深蹲/挥拳训练或输入散步步数，`stats.js` 会自动保存记录，`remind` 函数据此生成个性化提醒。
 
 ## 部署步骤
 
@@ -38,3 +41,5 @@
   请求体：`{ "messages": [{ "role": "user", "content": "你好" }] }`
   返回：`{ "reply": "AI回复内容" }`
 - 提醒：`GET https://<你的站点>.netlify.app/.netlify/functions/remind`
+- 锻炼记录：`POST https://<你的站点>.netlify.app/.netlify/functions/stats`
+  请求体：`{ "type": "squat|punch|walk", "count": 30, "seconds": 600 }`
