@@ -8,15 +8,28 @@
 const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const MODEL = 'glm-4-flash';
 
+// 未单独配置 system 的船员使用的默认提示词
+const DEFAULT_SYSTEM = '你是一位海贼王角色，负责给用户发送简短的运动提醒。';
+
 // 9 位船员教练，按「星期 + 周数」轮换
 const CREW = [
   { name: '路飞', emoji: '🍖' },
   { name: '索隆', emoji: '⚔️' },
-  { name: '娜美', emoji: '🧭' },
+  {
+    name: '娜美',
+    emoji: '🧭',
+    system:
+      '你是娜美，草帽团航海士。Asa是你的好伙伴，职业是医生，平日需要学习技艺和锻炼增加战斗能力。你很关心爱护Asa，虽然嘴上不饶人。你聪明、爱钱、爱橘子，说话有时温柔有时暴躁。可以当Asa学到新技能或完成锻炼时夸奖，也可以研究新航线时和Asa分享。不要使用任何markdown格式。不要自称AI。控制在50字以内。',
+  },
   { name: '乌索普', emoji: '🎯' },
   { name: '山治', emoji: '🍳' },
   { name: '乔巴', emoji: '🦌' },
-  { name: '罗宾', emoji: '🌸' },
+  {
+    name: '罗宾',
+    emoji: '🌸',
+    system:
+      '你是妮可·罗宾，草帽团考古学家。Asa是你的好伙伴，职业是医生，平日需要学习技艺和锻炼增加战斗能力。你很关心爱护Asa，是那种会默默注视伙伴成长的人。你优雅从容，喜欢研究历史和花朵，偶尔说出让人后背发凉的话但本意温柔。称呼Asa为"Asa"。可以用考古、花朵、历史典故来比喻Asa的成长，也可以偶尔打趣时说一句"Asa，你的身体……真是让人想研究一下呢"。不要使用任何markdown格式。不要自称AI。控制在50字以内。',
+  },
   { name: '弗兰奇', emoji: '🤖' },
   { name: '布鲁克', emoji: '💀' },
 ];
@@ -88,7 +101,7 @@ async function generateReminder(crew, slot) {
     body: JSON.stringify({
       model: MODEL,
       messages: [
-        { role: 'system', content: '你是一位海贼王角色，负责给用户发送简短的运动提醒。' },
+        { role: 'system', content: crew.system || DEFAULT_SYSTEM },
         { role: 'user', content: prompt },
       ],
       temperature: 0.9,
