@@ -1,0 +1,538 @@
+	<!DOCTYPE html>
+	<html lang="zh">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+	    <title>伟大航路运动记录指针</title>
+	    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+	    <style>
+	        * {
+	            box-sizing: border-box; margin: 0; padding: 0;
+	            -webkit-tap-highlight-color: transparent;
+	        }
+	        body {
+	            background: #f0f0f0; min-height: 100vh; display: flex;
+	            justify-content: center; align-items: center; padding: 8px;
+	            font-family: 'Noto Sans SC', sans-serif;
+	        }
+	        .game-wrapper {
+	            width: 100%; max-width: 420px; border-radius: 8px;
+	            padding: 16px; transition: all 0.3s; position: relative;
+	        }
+	        /* ==================== 一档：清透水彩像素风 ==================== */
+	        .theme-anime {
+	            background: #FFFFF0; 
+	            background-image: 
+	                linear-gradient(90deg, rgba(2, 119, 189, 0.05) 1px, transparent 1px),
+	                linear-gradient(rgba(2, 119, 189, 0.05) 1px, transparent 1px);
+	            background-size: 16px 16px;
+	            border: 6px solid #0277bd; 
+	            box-shadow: 6px 6px 0 #b3e5fc, 0 15px 20px rgba(0,0,0,0.1); 
+	        }
+	        .theme-anime .broadcast-bar {
+	            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0, rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px), #ffccbc;
+	            border: 3px solid #bf360c; border-radius: 4px; padding: 8px 10px; margin-bottom: 12px;
+	            display: flex; align-items: center; gap: 8px; box-shadow: 3px 3px 0 #ffab91; cursor: pointer;
+	        }
+	        .theme-anime .broadcast-icon { font-size: 20px; }
+	        .theme-anime .broadcast-text { flex: 1; font-size: 11px; color: #bf360c; font-weight: bold; line-height: 1.4; }
+	        .theme-anime .top-bar { display: flex; gap: 10px; margin-bottom: 16px; }
+	        .theme-anime .status-box {
+	            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0, rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px), #e1f5fe;
+	            border: 3px solid #0288d1; border-radius: 4px; padding: 6px 8px; flex: 1;
+	            display: flex; justify-content: center; align-items: center; color: #01579b;
+	            font-weight: bold; box-shadow: 3px 3px 0 rgba(2, 119, 189, 0.2); font-size: 11px;
+	        }
+	        .theme-anime .city-input { background: rgba(255,255,255,0.8); border: 2px solid #0288d1; color: #01579b; padding: 2px 4px; border-radius: 4px; flex: 1; min-width: 0; font-size: 11px; font-weight: bold; }
+	        .theme-anime .random-btn { background: #0288d1; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; font-size: 12px; cursor: pointer; flex-shrink: 0; }
+	        .theme-anime .npc-area { background: rgba(255, 255, 255, 0.6); border: 3px solid #0288d1; border-radius: 4px; padding: 12px; display: flex; align-items: center; gap: 12px; margin: 10px 0 16px; box-shadow: 4px 4px 0 #b3e5fc; }
+	        .theme-anime .npc-avatar { background: #fff; width: 50px; height: 50px; border-radius: 4px; border: 2px solid #0277bd; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+	        .theme-anime .npc-dialogue { flex: 1; font-size: 12px; color: #01579b; font-weight: bold; }
+	        .theme-anime .resources { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+	        .theme-anime .res-item { flex: 1; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0, rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px), #f1f8e9; border: 3px solid #7cb342; border-radius: 4px; padding: 8px; text-align: center; color: #33691e; font-weight: bold; font-size: 12px; box-shadow: 3px 3px 0 #dcedc8; }
+	        .theme-anime .motion-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+	        .theme-anime .motion-btn { background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0, rgba(255,255,255,0.3) 2px, transparent 2px, transparent 6px), #ffecb3; border: 3px solid #ff8f00; border-radius: 4px; color: #bf360c; padding: 12px 4px; font-size: 12px; cursor: pointer; box-shadow: 3px 3px 0 #ff8f00; text-align: center; font-weight: bold; }
+	        .theme-anime .motion-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #ff8f00; }
+	        .theme-anime .motion-btn.selected { background: #ff8f00; color: #fff; }
+	        .theme-anime .motion-btn.locked { pointer-events: none; opacity: 0.5; filter: grayscale(50%); }
+	        .theme-anime .timer-panel { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0, rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px), #ede7f6; border: 3px solid #5e35b1; border-radius: 4px; padding: 15px; text-align: center; margin-bottom: 16px; box-shadow: 4px 4px 0 #d1c4e9; }
+	        .theme-anime .timer-digits { font-size: 40px; color: #4527a0; font-family: 'Press Start 2P', monospace; text-shadow: 2px 2px 0 #d1c4e9; }
+	        .theme-anime .step-counter { font-size: 12px; color: #5e35b1; margin-top: 5px; font-weight: bold; }
+	        .theme-anime .feedback { background: #fffde7; border: 2px solid #ff8f00; border-radius: 4px; padding: 8px; font-size: 12px; color: #bf360c; margin-bottom: 16px; min-height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+	        .theme-anime .control-row { display: flex; gap: 10px; margin-bottom: 16px; }
+	        .theme-anime .btn { flex: 1; background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0, rgba(255,255,255,0.3) 2px, transparent 2px, transparent 6px), #4fc3f7; border: 3px solid #0277bd; color: #fff; border-radius: 4px; padding: 12px; font-size: 14px; cursor: pointer; box-shadow: 3px 3px 0 #0277bd; font-weight: bold; }
+	        .theme-anime .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #0277bd; }
+	        .theme-anime .story-card { background: radial-gradient(rgba(230, 81, 0, 0.1) 1px, transparent 2px), #fffde7; background-size: 8px 8px; border: 3px solid #ff8f00; border-radius: 4px; padding: 15px; margin-bottom: 16px; box-shadow: 4px 4px 0 #ffe082; position: relative; }
+	        .theme-anime .story-title { font-family: 'ZCOOL KuaiLe', cursive; color: #e65100; font-size: 18px; margin-bottom: 8px; }
+	        .theme-anime .story-text { font-size: 13px; color: #5d4037; line-height: 1.5; background: rgba(255, 253, 231, 0.8); padding: 2px; display: inline-block; }
+	        .theme-anime .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 16px; }
+	        .theme-anime .collect-item { background: linear-gradient(rgba(124, 179, 66, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 179, 66, 0.15) 1px, transparent 1px), #f1f8e9; background-size: 8px 8px; border: 3px solid #7cb342; border-radius: 4px; padding: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 3px 3px 0 #dcedc8; }
+	        .theme-anime .collect-item.locked { background: linear-gradient(rgba(144, 164, 174, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(144, 164, 174, 0.2) 1px, transparent 1px), #eceff1; border-color: #90a4ae; box-shadow: 3px 3px 0 #cfd8dc; opacity: 0.8; }
+	        .theme-anime .collect-icon { font-size: 28px; margin-bottom: 5px; background: rgba(255,255,255,0.6); border-radius: 4px; padding: 2px; }
+	        .theme-anime .collect-name { font-size: 10px; color: #33691e; text-align: center; font-weight: bold; background: rgba(255,255,255,0.6); padding: 1px 3px; border-radius: 2px; }
+	        .theme-anime .collect-item.locked .collect-name { color: #607d8b; }
+	        .theme-anime .nav-bar { display: flex; justify-content: space-around; background: #ffecb3; border: 3px solid #ff8f00; border-radius: 4px; padding: 4px 0; box-shadow: 4px 4px 0 #ff8f00; }
+	        .theme-anime .nav-item { padding: 8px 12px; font-size: 12px; cursor: pointer; color: #bf360c; font-weight: bold; border-radius: 4px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+	        .theme-anime .nav-item.active { background: #ff8f00; color: #fff; }
+	        .theme-toggle { position: absolute; top: -12px; right: 10px; background: #000; color: #fff; border: 2px solid #fff; border-radius: 4px; padding: 4px 8px; font-size: 10px; cursor: pointer; z-index: 20; font-weight: bold; }
+	        /* ==================== 二档：黑白漫画风 ==================== */
+	        .theme-manga {
+	            background: #fff; background-image: radial-gradient(#000 1px, transparent 1px); background-size: 12px 12px;
+	            border: 6px solid #000; box-shadow: 8px 8px 0 #000, 0 15px 20px rgba(0,0,0,0.3);
+	        }
+	        .theme-manga .broadcast-bar { background: #fff; border: 3px solid #000; border-radius: 0; padding: 8px 10px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 4px 4px 0 #000; cursor: pointer; position: relative; }
+	        .theme-manga .broadcast-bar::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 1px, transparent 8px); opacity: 0.05; }
+	        .theme-manga .broadcast-icon { font-size: 20px; filter: grayscale(100%) contrast(200%); position: relative; z-index: 1; }
+	        .theme-manga .broadcast-text { flex: 1; font-size: 11px; color: #000; font-weight: bold; line-height: 1.4; position: relative; z-index: 1; }
+	        .theme-manga .top-bar { display: flex; gap: 10px; margin-bottom: 16px; }
+	        .theme-manga .status-box { background: #fff; border: 3px solid #000; border-radius: 0; padding: 6px 8px; flex: 1; display: flex; justify-content: center; align-items: center; color: #000; font-weight: bold; box-shadow: 4px 4px 0 #000; font-size: 11px; }
+	        .theme-manga .city-input { background: #fff; border: 2px solid #000; color: #000; padding: 2px 4px; border-radius: 0; flex: 1; min-width: 0; font-size: 11px; font-weight: bold; }
+	        .theme-manga .random-btn { background: #000; color: #fff; border: 2px solid #000; padding: 4px 8px; border-radius: 0; font-size: 12px; cursor: pointer; box-shadow: 2px 2px 0 #555; flex-shrink: 0; }
+	        .theme-manga .npc-area { background: #fff; border: 4px solid #000; border-radius: 0; padding: 12px; display: flex; align-items: center; gap: 12px; margin: 10px 0 16px; box-shadow: 6px 6px 0 #000; }
+	        .theme-manga .npc-avatar { background: #fff; width: 50px; height: 50px; border-radius: 0; border: 3px solid #000; display: flex; align-items: center; justify-content: center; font-size: 30px; filter: grayscale(100%) contrast(200%); flex-shrink: 0; }
+	        .theme-manga .npc-dialogue { flex: 1; font-size: 12px; color: #000; font-weight: bold; }
+	        .theme-manga .resources { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 10px; }
+	        .theme-manga .res-item { flex: 1; background: #fff; border: 3px solid #000; border-radius: 0; padding: 8px; text-align: center; color: #000; font-weight: bold; font-size: 12px; box-shadow: 4px 4px 0 #000; }
+	        .theme-manga .motion-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+	        .theme-manga .motion-btn { background: #fff; border: 3px solid #000; border-radius: 0; color: #000; padding: 12px 4px; font-size: 12px; cursor: pointer; box-shadow: 4px 4px 0 #000; text-align: center; font-weight: bold; }
+	        .theme-manga .motion-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #000; }
+	        .theme-manga .motion-btn.selected { background: #000; color: #fff; }
+	        .theme-manga .motion-btn.locked { pointer-events: none; opacity: 0.5; }
+	        .theme-manga .timer-panel { background: #fff; border: 3px solid #000; border-radius: 0; padding: 15px; text-align: center; margin-bottom: 16px; box-shadow: 6px 6px 0 #000; }
+	        .theme-manga .timer-digits { font-size: 40px; color: #000; font-family: 'Press Start 2P', monospace; }
+	        .theme-manga .step-counter { font-size: 12px; color: #000; margin-top: 5px; font-weight: bold; }
+	        .theme-manga .feedback { background: #fff; border: 2px solid #000; border-radius: 0; padding: 8px; font-size: 12px; color: #000; margin-bottom: 16px; min-height: 30px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+	        .theme-manga .control-row { display: flex; gap: 10px; margin-bottom: 16px; }
+	        .theme-manga .btn { flex: 1; background: #fff; border: 3px solid #000; color: #000; border-radius: 0; padding: 12px; font-size: 14px; cursor: pointer; box-shadow: 6px 6px 0 #000; font-weight: bold; }
+	        .theme-manga .btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 #000; }
+	        .theme-manga .story-card { background: #fff; border: 4px solid #000; border-radius: 0; padding: 15px; margin-bottom: 16px; box-shadow: 6px 6px 0 #000; position: relative; }
+	        .theme-manga .story-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 1px, transparent 10px); opacity: 0.05; }
+	        .theme-manga .story-title { font-family: 'ZCOOL KuaiLe', cursive; color: #000; font-size: 18px; margin-bottom: 8px; border-bottom: 3px solid #000; padding-bottom: 4px; }
+	        .theme-manga .story-text { font-size: 13px; color: #000; line-height: 1.5; font-weight: bold; position: relative; z-index: 1; }
+	        .theme-manga .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-bottom: 16px; }
+	        .theme-manga .collect-item { background: #fff; border: 3px solid #000; border-radius: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 4px 4px 0 #000; position: relative; }
+	        .theme-manga .collect-item.locked { background: repeating-linear-gradient(45deg, #000 0, #000 2px, transparent 2px, transparent 6px); border-color: #000; }
+	        .theme-manga .collect-icon { font-size: 28px; margin-bottom: 5px; filter: grayscale(100%) contrast(200%); }
+	        .theme-manga .collect-item.locked .collect-icon { filter: grayscale(100%) contrast(200%) brightness(0); opacity: 0.5; }
+	        .theme-manga .collect-name { font-size: 10px; color: #000; text-align: center; font-weight: bold; }
+	        .theme-manga .collect-item.locked .collect-name { color: #000; opacity: 0.5; }
+	        .theme-manga .nav-bar { display: flex; justify-content: space-around; background: #fff; border: 3px solid #000; border-radius: 0; padding: 4px 0; box-shadow: 6px 6px 0 #000; }
+	        .theme-manga .nav-item { padding: 8px 12px; font-size: 12px; cursor: pointer; color: #000; font-weight: bold; border-radius: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+	        .theme-manga .nav-item.active { background: #000; color: #fff; }
+	        .theme-manga .theme-toggle { background: #fff; color: #000; border: 2px solid #000; }
+	        /* 通用 UI */
+	        .page { display: none; flex-direction: column; }
+	        .page.active-page { display: flex; }
+	        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; }
+	        /* 强制二档漫画风结算弹窗 */
+	        .modal-content {
+	            background: #fff; border: 4px solid #000; border-radius: 0; padding: 25px;
+	            text-align: center; width: 90%; max-width: 320px; box-shadow: 8px 8px 0 #000;
+	            position: relative;
+	        }
+	        .modal-content::before {
+	            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+	            background: repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 1px, transparent 10px);
+	            opacity: 0.05; pointer-events: none;
+	        }
+	        .modal-content h2 { font-family: 'ZCOOL KuaiLe'; color: #000; margin-bottom: 15px; border-bottom: 3px solid #000; padding-bottom: 5px; position: relative; z-index: 1; }
+	        .modal-content p { color: #000; margin-bottom: 8px; font-weight: bold; position: relative; z-index: 1; }
+	        .modal-content .reward { color: #000; font-size: 18px; margin: 15px 0; font-family: 'Press Start 2P'; position: relative; z-index: 1; }
+	        .modal-btn { background: #000; color: #fff; border: 2px solid #000; padding: 10px 20px; border-radius: 0; font-family: inherit; cursor: pointer; font-weight: bold; box-shadow: 4px 4px 0 #555; position: relative; z-index: 1; }
+	    </style>
+	</head>
+	<body>
+	<div class="game-wrapper theme-anime" id="gameWrapper">
+	    <button class="theme-toggle" id="themeToggle">二档</button>
+	    <div class="broadcast-bar" id="broadcastBar">
+	        <span class="broadcast-icon" id="broadcastIcon">🏴‍☠️</span>
+	        <span class="broadcast-text" id="broadcastText">点击获取海贼广播</span>
+	    </div>
+	    <div class="top-bar">
+	        <div class="status-box">
+	            <input type="text" id="cityInput" class="city-input" placeholder="输入地名" value="风车村">
+	            <button class="random-btn" id="randomLocBtn">🎲</button>
+	        </div>
+	        <div class="status-box">
+	            <span id="weekday">三</span>&nbsp;<span id="timeDisplay">15:01</span>&nbsp;฿<span id="bountyAmount">0</span>
+	        </div>
+	    </div>
+	    <div id="homePage" class="page active-page">
+	        <div class="npc-area">
+	            <div class="npc-avatar" id="npcAvatar">🏴‍☠️</div>
+	            <div class="npc-dialogue" id="npcDialogue">点击海贼旗切换伙伴</div>
+	        </div>
+	        <div class="resources">
+	            <div class="res-item">⚡磁力: <span id="homeEnergy">0</span></div>
+	            <div class="res-item">📖日志: <span id="homeAlloy">0</span>/80</div>
+	        </div>
+	        <div class="story-card">
+	            <div class="story-title">当前悬赏金</div>
+	            <div class="story-text" style="font-size: 24px; font-family: 'Press Start 2P'; color: #e65100;">฿ <span id="homeBountyAmount">0</span></div>
+	        </div>
+	    </div>
+	    <div id="sportPage" class="page">
+	        <div class="motion-grid">
+	            <div class="motion-btn selected" data-type="squat">🧗深蹲</div>
+	            <div class="motion-btn" data-type="punch">🥊挥拳</div>
+	            <div class="motion-btn" data-type="walk">🚶散步</div>
+	        </div>
+	        <div class="timer-panel">
+	            <div class="timer-digits" id="timerDisplay">00:00</div>
+	            <div class="step-counter">动作次数: <span id="stepCount">0</span></div>
+	        </div>
+	        <div class="feedback" id="feedbackMsg">选择模式开始修炼</div>
+	        <div class="control-row">
+	            <div class="btn" id="startBtn">▶ 开始</div>
+	            <div class="btn" id="stopBtn">■ 结束</div>
+	        </div>
+	    </div>
+	    <div id="storyPage" class="page">
+	        <div class="story-card">
+	            <div class="story-title">第 <span id="storyChapter">1</span>/80 站</div>
+	            <div class="story-text" id="storyText">一切始于风车村...</div>
+	        </div>
+	        <div class="btn" id="advanceStoryBtn" style="width:100%; text-align:center;">推进记录指针</div>
+	    </div>
+	    <div id="collectionPage" class="page">
+	        <div class="collection-grid" id="collectionGrid"></div>
+	    </div>
+	    <div class="nav-bar" style="margin-top: 16px;">
+	        <span class="nav-item active" data-page="home">🚢<div>甲板</div></span>
+	        <span class="nav-item" data-page="sport">🥊<div>修炼</div></span>
+	        <span class="nav-item" data-page="story">🧭<div>航海</div></span>
+	        <span class="nav-item" data-page="collection">💰<div>悬赏</div></span>
+	    </div>
+	</div>
+	<div class="modal-overlay" id="resultModal">
+	    <div class="modal-content">
+	        <h2 id="resultTitle">修炼结束</h2>
+	        <p id="resultTime">用时：00:00</p>
+	        <p id="resultAction">动作次数：0 次</p>
+	        <div class="reward" id="resultReward">获得磁力：0 ⚡</div>
+	        <button class="modal-btn" onclick="closeModal()">继续航行</button>
+	    </div>
+	</div>
+	<script>
+	    (function() {
+	        let energy = parseInt(localStorage.getItem('op_energy')) || 100;
+	        let storyNode = parseInt(localStorage.getItem('op_storyNode')) || 1;
+	        let collected = JSON.parse(localStorage.getItem('op_collected')) || [];
+	        let currentType = 'squat';
+	        let timerInterval = null, seconds = 0, isRunning = false, stepCount = 0;
+	        let lastAccel = {x:0, y:0, z:0}, lastPeakTime = 0;
+	        let todayDate = new Date().toDateString();
+	        let walkDate = localStorage.getItem('op_walkDate');
+	        let walkEnergyToday = parseInt(localStorage.getItem('op_walkEnergy')) || 0;
+	        if (walkDate !== todayDate) {
+	            walkEnergyToday = 0; localStorage.setItem('op_walkDate', todayDate); localStorage.setItem('op_walkEnergy', 0);
+	        }
+	        const opLocations = ['风车村', '谢尔兹镇', '橘子镇', '西罗布村', '巴拉蒂', '可可亚西村', '罗格镇', '颠倒山', '双子岬', '威士忌山峰', '小花园', '磁鼓岛', '阿拉巴斯坦', '加雅岛', '空岛', '长环岛', '水之七岛', '司法岛', '恐怖三桅帆船', '香波地群岛', '女儿岛', '推进城', '马林梵多', '鱼人岛', '庞克哈萨德', '德雷斯罗萨', '佐乌', '蛋糕岛', '和之国'];
+	        const broadcastLib = [
+	            { icon: '🧭', text: '世代传承的意志，时代的变迁，人的梦想...' },
+	            { icon: '👒', text: '我是要成为海贼王的男人！' },
+	            { icon: '⚔️', text: '背后的伤痕，是剑士的耻辱！' },
+	            { icon: '🍊', text: '在这个辽阔的海洋上，总有愿意守护你的人！' },
+	            { icon: '🤥', text: '我可是勇敢的海上战士！' },
+	            { icon: '🍳', text: '能填饱肚子的就是好菜！' },
+	            { icon: '🦌', text: '即使相遇会带来分别，我也想遇见你！' },
+	            { icon: '🌸', text: '人什么时候才会死？被世人遗忘的时候！' },
+	            { icon: '🛠️', text: '我要看到梦想中的船到达世界尽头！' },
+	            { icon: '🎵', text: '拉布，我们一定会再回来的！' },
+	            { icon: '🐳', text: '不要输给这股海流啊！' },
+	            { icon: '☀️', text: '如果是男人的话，就要选择不会后悔的生活方式！' },
+	            { icon: '🔥', text: '只要还活着，无论多少次都要重新挑战！' },
+	            { icon: '🌊', text: '大海是这样的广阔，它包容了所有的战斗和离别！' },
+	            { icon: '🦴', text: '男人的心底有不能退让的东西！' },
+	            { icon: '⏳', text: '历史虽然会重演，但人类绝不能停下脚步！' },
+	            { icon: '🗺️', text: '冒险的开始总是令人兴奋的！' },
+	            { icon: '☠️', text: '一艘没有船长的船，跟没有灵魂的空壳有什么区别！' },
+	            { icon: '🐅', text: '如果你是剑客，就拔出你的剑！' },
+	            { icon: '🕊️', text: '自由是这世界上最宝贵的东西！' },
+	            { icon: '🤝', text: '因为是伙伴，所以相信！' },
+	            { icon: '⭐', text: '不要让梦想变成只是梦！' },
+	            { icon: '🌧️', text: '即使是在黑暗中，也要自己发光！' },
+	            { icon: '🏝️', text: '只要活着，哪里都是乐园！' },
+	            { icon: '🍀', text: '奇迹只会降临在不言放弃的人身上！' }
+	        ];
+	        // 80站极度细化剧情
+	        const stories = [
+	            { text:'风车村·路飞的誓言：为了让香克斯还草帽，我一定要成为海贼王！', cost: 20, bounty: 500, vol: '卷一《ROMANCE DAWN》' },
+	            { text:'风车村·近海之王：路飞误吞橡胶果实，香克斯为救他失去左臂！', cost: 25, bounty: 1000, vol: '卷一《戴草帽的少年》' },
+	            { text:'风车村·男人的约定：香克斯留下草帽，约定在伟大航路再见！', cost: 30, bounty: 1500, vol: '卷一《冒险的黎明》' },
+	            { text:'风车村·十年后：17岁的路飞独自乘小船出海，冒险正式开始！', cost: 35, bounty: 2000, vol: '卷一《ROMANCE DAWN》' },
+	            { text:'风车村·拯救克比：路飞一拳打飞爱说大话的克比，意外遇到亚尔丽塔！', cost: 40, bounty: 3000, vol: '卷二《那个不可欺骗的人》' },
+	            { text:'谢尔兹镇·蒙卡的压迫：海军上校 Axe-Hand Colby 欺压百姓！', cost: 45, bounty: 4000, vol: '卷二《VS.百兽之王》' },
+	            { text:'谢尔兹镇·处刑台上的索隆：路飞答应帮索隆松绑，条件是入伙！', cost: 50, bounty: 5000, vol: '卷二《海贼猎人》' },
+	            { text:'谢尔兹镇·三刀流剑士：索隆拿起和道一文字，路飞用橡胶枪打飞蒙卡！', cost: 55, bounty: 6000, vol: '卷二《那个不可欺骗的人》' },
+	            { text:'橘子镇·小丑巴基：会四分五裂的巴基，路飞第一次面临果实能力战！', cost: 60, bounty: 8000, vol: '卷三《那个不可欺骗的人》' },
+	            { text:'橘子镇·驯兽师摩奇：摩奇的狮子利基被路飞一拳 KO！', cost: 65, bounty: 10000, vol: '卷三《别小看女人》' },
+	            { text:'橘子镇·娜美登场：聪明的航海士看上了路飞，初步结成临时同盟！', cost: 70, bounty: 12000, vol: '卷三《那个不可欺骗的人》' },
+	            { text:'橘子镇·巴基的惨败：路飞利用橡胶身体免疫斩击，击飞了巴基！', cost: 80, bounty: 15000, vol: '卷四《走喽！》' },
+	            { text:'西罗布村·吹牛的乌索普：遇到爱说大话的长鼻子，黑猫海贼团逼近！', cost: 90, bounty: 18000, vol: '卷四《樱花》' },
+	            { text:'西罗布村·可雅的别墅：乌索普每天来别墅讲故事，守护可雅的笑容！', cost: 100, bounty: 20000, vol: '卷四《那个不可欺骗的人》' },
+	            { text:'西罗布村·黑猫海贼团：克洛船长的阴谋浮现，乌索普挺身而出！', cost: 110, bounty: 25000, vol: '卷四《恶棍》' },
+	            { text:'西罗布村·乌索普的勇气：乌索普戴上面具，勇敢迎战 Jame！', cost: 120, bounty: 30000, vol: '卷四《樱花》' },
+	            { text:'西罗布村·击败克洛：路飞用橡胶钟摆头锤击败了百计克洛！', cost: 130, bounty: 35000, vol: '卷四《走喽！》' },
+	            { text:'西罗布村·梅利号起航：可雅赠予黄金与帆船，草帽团拥有了第一艘船！', cost: 140, bounty: 40000, vol: '卷四《走喽！》' },
+	            { text:'海上餐厅巴拉蒂·哲普的传说：遇到红脚哲普，山治的过去浮现！', cost: 150, bounty: 45000, vol: '卷五《为了谁的晚餐》' },
+	            { text:'海上餐厅巴拉蒂·克利克的野心：拥有金刚钻铠甲的提督克里克来袭！', cost: 160, bounty: 50000, vol: '卷五《恶棍》' },
+	            { text:'海上餐厅巴拉蒂·鹰眼登场：世界第一大剑豪出现，索隆发起挑战！', cost: 170, bounty: 55000, vol: '卷五《鹰眼》' },
+	            { text:'海上餐厅巴拉蒂·背后的伤痕：索隆败北，但鹰眼认可了他的勇气！', cost: 180, bounty: 60000, vol: '卷六《誓言》' },
+	            { text:'海上餐厅巴拉蒂·山治的谢恩：山治为报恩情与哲普诀别，以厨师身份登船！', cost: 190, bounty: 70000, vol: '卷六《为了谁的晚餐》' },
+	            { text:'可可亚西村·娜美的泪水：见死不救的娜美，路飞把草帽扣在她头上！', cost: 200, bounty: 80000, vol: '卷十一《东海最恶之罪犯》' },
+	            { text:'可可亚西村·恶龙的支配：恶龙利用娜美绘制海图，奴役着整个村子！', cost: 220, bounty: 90000, vol: '卷十《OK，开始》' },
+	            { text:'可可亚西村·战斗开始：草帽团四人攻入恶龙公园，迎战鱼人海贼团！', cost: 240, bounty: 100000, vol: '卷十《OK，开始》' },
+	            { text:'可可亚西村·索隆的水中战：索隆在水下用一刀流击败了小八！', cost: 260, bounty: 110000, vol: '卷十一《东海最恶之罪犯》' },
+	            { text:'可可亚西村·山治的鱼人空手道：山治用恶魔风脚击败了克罗欧比！', cost: 280, bounty: 120000, vol: '卷十一《东海最恶之罪犯》' },
+	            { text:'可可亚西村·摧毁恶龙领域：路飞撞碎恶龙领域，宣告东海最恶诞生！', cost: 300, bounty: 150000, vol: '卷十二《记录指针》' },
+	            { text:'罗格镇·开始与结束的城镇：海贼王出生与死亡的地方，冒险的真正起点！', cost: 320, bounty: 160000, vol: '卷十一《继承意志》' },
+	            { text:'罗格镇·处刑台上的微笑：路飞在罗杰死处被巴基抓住，却微笑着面对！', cost: 340, bounty: 170000, vol: '卷十一《继承意志》' },
+	            { text:'罗格镇·革命军的介入：多拉格现身，用狂风掩护路飞逃离斯摩格！', cost: 360, bounty: 180000, vol: '卷十二《记录指针》' },
+	            { text:'罗格镇·冲向颠倒山：草帽团在暴风雨中扬帆，冲上伟大航路的入口！', cost: 380, bounty: 200000, vol: '卷十二《记录指针》' },
+	            { text:'颠倒山·逆流而上的冒险：利用海流冲上山顶，正式进入伟大航路！', cost: 400, bounty: 220000, vol: '卷十二《记录指针》' },
+	            { text:'双子岬·鲸鱼拉布的守候：巨大的鲸鱼在等故人归来，路飞与它定下新约定！', cost: 420, bounty: 240000, vol: '卷十二《记录指针》' },
+	            { text:'双子岬·库洛卡斯医生：灯塔守护者库洛卡斯，指引了记录指针的用法！', cost: 440, bounty: 260000, vol: '卷十三《无所谓啦！》' },
+	            { text:'威士忌山峰·赏金猎人的陷阱：看似欢迎的镇子，实则是赏金猎人的巢穴！', cost: 460, bounty: 280000, vol: '卷十三《无所谓啦！》' },
+	            { text:'威士忌山峰·索隆的战绩：索隆一人击败了100名赏金猎人！', cost: 480, bounty: 300000, vol: '卷十三《无所谓啦！》' },
+	            { text:'威士忌山峰·薇薇公主现身：意外结识阿拉巴斯坦公主，护送任务开始！', cost: 500, bounty: 350000, vol: '卷十三《无所谓啦！》' },
+	            { text:'威士忌山峰·Mr.5的追杀：巴洛克工作社高级特工现身，草帽团迎击！', cost: 520, bounty: 400000, vol: '卷十四《本能》' },
+	            { text:'小花园·巨人的决斗：青鬼与赤鬼的百年之战，预知记录指针的锚点！', cost: 540, bounty: 450000, vol: '卷十四《本能》' },
+	            { text:'小花园·Mr.3的陷阱：蜡蜡果实能力者设下陷阱，索隆等人被困！', cost: 560, bounty: 500000, vol: '卷十五《走喽！》' },
+	            { text:'小花园·路飞的火拳：路飞和乌索普用火攻击败了 Mr.3！', cost: 580, bounty: 550000, vol: '卷十五《走喽！》' },
+	            { text:'小花园·巨人的荣耀：多利和布洛基恢复了友谊，继续他们的决斗！', cost: 600, bounty: 600000, vol: '卷十五《走喽！》' },
+	            { text:'磁鼓岛·积雪的孤岛：为了救患病的娜美，不顾风雪登岛求医！', cost: 620, bounty: 650000, vol: '卷十五《走喽！》' },
+	            { text:'磁鼓岛·瓦尔波的暴政：吞吞果实能力者瓦尔波统治着这个国家！', cost: 640, bounty: 700000, vol: '卷十六《希鲁鲁克》' },
+	            { text:'磁鼓岛·庸医的樱花：庸医希鲁鲁克的信念化作樱花，治愈了乔巴的心！', cost: 660, bounty: 750000, vol: '卷十七《希尔尔克》' },
+	            { text:'磁鼓岛·乔巴的过去：被人唾弃的驯鹿，在庸医那里找到了温暖！', cost: 680, bounty: 800000, vol: '卷十七《希尔尔克》' },
+	            { text:'磁鼓岛·最强盾牌：乔巴用蓝波球变身，配合路飞击败了瓦尔波！', cost: 700, bounty: 850000, vol: '卷十八《EP.1》' },
+	            { text:'磁鼓岛·乔巴入伙：七段变形的驯鹿医生，成为草帽团第五名伙伴！', cost: 720, bounty: 900000, vol: '卷十八《EP.1》' },
+	            { text:'阿拉巴斯坦·沙漠之旅：与叛乱军、皇家军的纠葛，沙鳄鱼的阴谋浮现！', cost: 740, bounty: 950000, vol: '卷十八《EP.1》' },
+	            { text:'阿拉巴斯坦·遇险沙漠：路飞在沙漠中迷路，偶遇 Dance Powder！', cost: 760, bounty: 1000000, vol: '卷十九《反叛》' },
+	            { text:'阿拉巴斯坦·叛乱军的真相：薇薇试图阻止叛乱，克洛克达尔步步紧逼！', cost: 780, bounty: 1100000, vol: '卷十九《反叛》' },
+	            { text:'阿拉巴斯坦·鳄鱼的陷阱：面对自然系的沙沙果实，路飞第一次惨败！', cost: 800, bounty: 1200000, vol: '卷二十《大决战》' },
+	            { text:'阿拉巴斯坦·雨水降临：路飞用水打湿自己，三战克洛克达尔将其击败！', cost: 820, bounty: 1500000, vol: '卷二十《大决战》' },
+	            { text:'阿拉巴斯坦·王家之墓：罗宾自愿加入，古代兵器冥王的线索暂时封存！', cost: 840, bounty: 1800000, vol: '卷二十一《理想乡》' },
+	            { text:'阿拉巴斯坦·叛乱结束：叛乱军与皇家军明白真相，国家迎来和平！', cost: 860, bounty: 2000000, vol: '卷二十一《理想乡》' },
+	            { text:'告别之桥·伙伴的印记：薇薇不想连累大家，举起左手背展示伙伴印记！', cost: 880, bounty: 2500000, vol: '卷二十三《薇薇的冒险》' },
+	            { text:'告别之桥·新的航程：虽然没有说再见，但伙伴的印记永远不会消失！', cost: 900, bounty: 3000000, vol: '卷二十三《告别》' },
+	            { text:'加雅岛·蒙布朗的日记：为了证明空岛存在，罗兰度的后代与猿山联合军！', cost: 920, bounty: 3500000, vol: '卷二十四《人的梦想》' },
+	            { text:'加雅岛·黑胡子的教诲：在魔谷镇遇到蒂奇，他说“人的梦想是不会终结的”！', cost: 940, bounty: 4000000, vol: '卷二十四《人的梦想》' },
+	            { text:'加雅岛·空岛的存在：记录指针指向上方，草帽团确信空岛是真的！', cost: 960, bounty: 4500000, vol: '卷二十五《空岛》' },
+	            { text:'加雅岛·冲天海流：利用冲击浪头，黄金梅丽号直冲一万米高空！', cost: 980, bounty: 5000000, vol: '卷二十五《空岛》' },
+	            { text:'空岛·天使海滩：到达白海，遇到天使居民，感受空岛的奇妙！', cost: 1000, bounty: 6000000, vol: '卷二十六《大冒险》' },
+	            { text:'空岛·神之制裁：自称神的艾尼路，用雷电制裁不服从的人！', cost: 1050, bounty: 7000000, vol: '卷二十七《前奏》' },
+	            { text:'空岛·生存游戏：草帽团与众强者参加生存游戏，直面神之军队！', cost: 1100, bounty: 8000000, vol: '卷二十八《神之岛》' },
+	            { text:'空岛·索隆的烦恼：索隆用一刀流·飞龙·火焰击败了空岛神官！', cost: 1150, bounty: 9000000, vol: '卷二十九《圣白色》' },
+	            { text:'空岛·山治的脚法：山治在空中展现恶魔风脚，击败了神官！', cost: 1200, bounty: 10000000, vol: '卷二十九《圣白色》' },
+	            { text:'空岛·黄金乡的真相：香迪亚人的祖先确实来自地面的黄金乡！', cost: 1250, bounty: 12000000, vol: '卷三十《响彻云霄》' },
+	            { text:'空岛·响彻云霄的钟声：路飞击碎艾尼路的心网，将黄金钟敲响！', cost: 1300, bounty: 15000000, vol: '卷三十《响彻云霄》' },
+	            { text:'空岛·冒险的谢幕：钟声传达给地面的蒙布朗，空岛篇完美收官！', cost: 1350, bounty: 20000000, vol: '卷三十二《大冒险》' }
+	        ];
+	        const $ = id => document.getElementById(id);
+	        const homeEnergy = $('homeEnergy'), homeAlloy = $('homeAlloy'), bountyAmount = $('bountyAmount'), homeBountyAmount = $('homeBountyAmount');
+	        const npcAvatar = $('npcAvatar'), npcDialogue = $('npcDialogue');
+	        const timerDisplay = $('timerDisplay'), stepCountSpan = $('stepCount'), feedbackMsg = $('feedbackMsg');
+	        const storyChapter = $('storyChapter'), storyText = $('storyText'), advanceBtn = $('advanceStoryBtn');
+	        const collectionGrid = $('collectionGrid'), gameWrapper = $('gameWrapper');
+	        const crew = [
+	            { logo: '🏴‍☠️', line: '我是要成为海贼王的男人！' },
+	            { logo: '🗡️', line: '我要成为世界第一大剑豪！' },
+	            { logo: '🍊', line: '我要画出全世界的海图！' },
+	            { logo: '🤥', line: '我可是勇敢的海上战士！' },
+	            { logo: '🍳', line: '我要找到传说中的All Blue！' },
+	            { logo: '🦌', line: '我要成为能治愈任何疾病的医生！' },
+	            { logo: '🌸', line: '我要寻找真正的历史正文！' },
+	            { logo: '🛠️', line: '我要看到梦想中的船到达世界尽头！' },
+	            { logo: '🎵', line: '我要再次见到拉布，完成我们的约定！' }
+	        ];
+	        function init() {
+	            renderCollection();
+	            updateResources();
+	            updateStoryUI();
+	            randomBroadcast();
+	            applySeasonAndNight();
+	            setInterval(applySeasonAndNight, 60000);
+	        }
+	        function beep(freq = 880) {
+	            try {
+	                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+	                let osc = ctx.createOscillator(), gain = ctx.createGain();
+	                osc.type = 'square'; osc.frequency.value = freq;
+	                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+	                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+	                osc.connect(gain); gain.connect(ctx.destination);
+	                osc.start(); osc.stop(ctx.currentTime + 0.1);
+	            } catch(e) {}
+	        }
+	        function randomBroadcast() {
+	            let r = Math.floor(Math.random() * broadcastLib.length);
+	            $('broadcastIcon').innerText = broadcastLib[r].icon;
+	            $('broadcastText').innerText = broadcastLib[r].text;
+	        }
+	        $('broadcastBar').addEventListener('click', () => { beep(660); randomBroadcast(); });
+	        npcAvatar.addEventListener('click', () => {
+	            beep(660);
+	            let r = Math.floor(Math.random() * crew.length);
+	            npcAvatar.innerText = crew[r].logo;
+	            npcDialogue.innerText = crew[r].line;
+	        });
+	        function renderCollection() {
+	            let html = '';
+	            for (let i = 0; i < stories.length; i++) {
+	                let owned = collected.includes(i);
+	                html += `<div class="collect-item ${owned ? '' : 'locked'}">
+	                            <div class="collect-icon">${owned ? '📖' : '🔒'}</div>
+	                            <div class="collect-name">${owned ? stories[i].vol : '??? 封印中'}</div>
+	                         </div>`;
+	            }
+	            collectionGrid.innerHTML = html;
+	        }
+	        function updateResources() {
+	            homeEnergy.innerText = energy;
+	            homeAlloy.innerText = collected.length;
+	            let currentBounty = storyNode > 1 ? stories[storyNode - 2].bounty : 0;
+	            bountyAmount.innerText = currentBounty.toLocaleString();
+	            homeBountyAmount.innerText = currentBounty.toLocaleString();
+	            localStorage.setItem('op_energy', energy);
+	        }
+	        function formatTime(sec) {
+	            let m = Math.floor(sec / 60).toString().padStart(2,'0');
+	            let s = (sec % 60).toString().padStart(2,'0');
+	            return m+':'+s;
+	        }
+	        function updateTimerUI() { timerDisplay.innerText = formatTime(seconds); }
+	        document.querySelectorAll('.motion-btn').forEach(btn => {
+	            btn.addEventListener('click', function() {
+	                if (isRunning) return;
+	                beep(440);
+	                document.querySelectorAll('.motion-btn').forEach(b => b.classList.remove('selected'));
+	                this.classList.add('selected');
+	                currentType = this.dataset.type;
+	            });
+	        });
+	        function handleMotion(e) {
+	            if (!isRunning) return;
+	            let acc = e.accelerationIncludingGravity;
+	            if (!acc) return;
+	            let deltaX = Math.abs(acc.x - lastAccel.x), deltaY = Math.abs(acc.y - lastAccel.y), deltaZ = Math.abs(acc.z - lastAccel.z);
+	            lastAccel = {x:acc.x, y:acc.y, z:acc.z};
+	            let now = Date.now(), isPeak = false;
+	            if (currentType === 'squat' && deltaZ > 8) isPeak = true; 
+	            else if (currentType === 'punch' && (deltaX > 10 || deltaY > 10) && deltaZ < 8) isPeak = true;
+	            if (isPeak && (now - lastPeakTime > 600)) {
+	                lastPeakTime = now; stepCount++; energy += 5; updateResources();
+	                stepCountSpan.innerText = stepCount;
+	                feedbackMsg.innerText = `动作达标! +5 ⚡`; beep(1200);
+	            }
+	        }
+	        $('startBtn').addEventListener('click', function() {
+	            if (currentType === 'walk') { handleWalkInput(); return; }
+	            if (isRunning) return; 
+	            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+	                DeviceMotionEvent.requestPermission().then(state => {
+	                    if (state === 'granted') { window.addEventListener('devicemotion', handleMotion); startTimer(); }
+	                    else { feedbackMsg.innerText = '需开启运动权限才能计分'; }
+	                }).catch(console.error);
+	            } else {
+	                if (window.DeviceMotionEvent) window.addEventListener('devicemotion', handleMotion);
+	                startTimer();
+	            }
+	        });
+	        function startTimer() {
+	            beep(660); isRunning = true; seconds = 0; stepCount = 0;
+	            updateTimerUI(); stepCountSpan.innerText = stepCount;
+	            feedbackMsg.innerText = '修炼开始！';
+	            document.querySelectorAll('.motion-btn').forEach(b => { if(!b.classList.contains('selected')) b.classList.add('locked'); });
+	            timerInterval = setInterval(() => {
+	                if (!isRunning) return; seconds++; updateTimerUI();
+	                if (seconds % 60 === 0) { energy += 1; updateResources(); feedbackMsg.innerText = "坚持修炼奖励! +1 ⚡"; }
+	            }, 1000);
+	        }
+	        $('stopBtn').addEventListener('click', () => {
+	            if (!isRunning) return; beep(330); isRunning = false;
+	            clearInterval(timerInterval); window.removeEventListener('devicemotion', handleMotion);
+	            document.querySelectorAll('.motion-btn').forEach(b => b.classList.remove('locked'));
+	            let totalReward = Math.floor(seconds / 60) + stepCount * 5;
+	            $('resultTime').innerText = `用时：${formatTime(seconds)}`;
+	            $('resultAction').innerText = `动作次数：${stepCount} 次`;
+	            $('resultReward').innerText = `获得磁力：+${totalReward} ⚡`;
+	            $('resultModal').style.display = 'flex';
+	            feedbackMsg.innerText = `修炼结束！共获得 ${totalReward} ⚡`;
+	        });
+	        function handleWalkInput() {
+	            let remaining = 500 - walkEnergyToday;
+	            if (remaining <= 0) { alert("今日散步磁力已刷满(500⚡)！"); return; }
+	            let input = prompt(`请输入刚才散步的步数：\n(汇率：10步=1⚡)\n今日剩余可兑换：${remaining}⚡`, "");
+	            if (input === null) return;
+	            let steps = parseInt(input);
+	            if (isNaN(steps) || steps <= 0) { alert("请输入正确的步数数字！"); return; }
+	            let gainedEnergy = Math.floor(steps / 10);
+	            if (gainedEnergy > remaining) { gainedEnergy = remaining; alert(`已达今日上限。本次实际兑换：${gainedEnergy}⚡`); }
+	            energy += gainedEnergy; walkEnergyToday += gainedEnergy;
+	            localStorage.setItem('op_walkEnergy', walkEnergyToday); updateResources();
+	            $('resultTime').innerText = `输入步数：${steps} 步`;
+	            $('resultAction').innerText = `汇率折算：10步 = 1⚡`;
+	            $('resultReward').innerText = `获得磁力：+${gainedEnergy} ⚡\n(今日剩余：${500 - walkEnergyToday}⚡)`;
+	            $('resultModal').style.display = 'flex';
+	        }
+	        window.closeModal = () => $('resultModal').style.display = 'none';
+	        function updateStoryUI() {
+	            storyChapter.innerText = storyNode;
+	            let idx = storyNode - 1;
+	            if (idx >= 0 && idx < stories.length) {
+	                storyText.innerText = stories[idx].text;
+	                advanceBtn.innerText = storyNode >= stories.length ? "已到达空岛终点" : `推进记录指针 (消耗 ${stories[idx].cost}⚡)`;
+	            }
+	        }
+	        advanceBtn.addEventListener('click', ()=>{
+	            beep(); if (storyNode >= stories.length) return;
+	            let cost = stories[storyNode - 1].cost;
+	            if (energy >= cost) {
+	                energy -= cost; storyNode++;
+	                let idx = storyNode - 2;
+	                if (!collected.includes(idx)) {
+	                    collected.push(idx);
+	                    localStorage.setItem('op_collected', JSON.stringify(collected));
+	                    renderCollection();
+	                    alert(`航海日志解锁！\n${stories[idx].vol}\n悬赏金提升至：฿${stories[idx].bounty.toLocaleString()}`);
+	                }
+	                localStorage.setItem('op_storyNode', storyNode);
+	                updateResources(); updateStoryUI();
+	            } else { alert(`磁力不足！还需 ${cost - energy} ⚡`); }
+	        });
+	        function applySeasonAndNight() {
+	            const now = new Date(); const hour = now.getHours();
+	            $('timeDisplay').innerText = hour.toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+	            const weekdays = ['日','一','二','三','四','五','六'];
+	            $('weekday').innerText = weekdays[now.getDay()];
+	        }
+	        document.querySelectorAll('.nav-item').forEach(item => {
+	            item.addEventListener('click', function() {
+	                beep(550);
+	                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+	                this.classList.add('active');
+	                document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+	                $(this.dataset.page + 'Page').classList.add('active-page');
+	            });
+	        });
+	        $('themeToggle').addEventListener('click', () => {
+	            beep(770);
+	            if (gameWrapper.classList.contains('theme-anime')) {
+	                gameWrapper.classList.remove('theme-anime'); gameWrapper.classList.add('theme-manga');
+	                $('themeToggle').innerText = '一档';
+	            } else {
+	                gameWrapper.classList.remove('theme-manga'); gameWrapper.classList.add('theme-anime');
+	                $('themeToggle').innerText = '二档';
+	            }
+	        });
+	        $('randomLocBtn').addEventListener('click', function() {
+	            beep(550);
+	            let r = Math.floor(Math.random() * opLocations.length);
+	            $('cityInput').value = opLocations[r];
+	        });
+	        init();
+	    })();
+	</script>
+	</body>
+	</html>
