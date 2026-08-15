@@ -14,7 +14,7 @@ const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const MODEL = 'glm-4-flash';
 
 const STATS_STORE = 'exercise-stats';
-const STATS_KEY = '***';
+const STATS_KEY = 'asa-stats';
 
 // 北京时间当前小时（Netlify 函数运行在 UTC，这里转成 UTC+8）
 function getBeijingHour(date = new Date()) {

@@ -19,7 +19,7 @@
 - **对话交互**：页面通过 `chat` 函数调用智谱 AI（`glm-4-flash`），让船员角色和你聊天、陪你打卡。
 - **伙伴聊天**：点击甲板上的伙伴头像（或按 🔄 切换伙伴）会弹出聊天窗，可以和 9 位船员 AI 聊天；人设与微信提醒共用同一份配置。
 - **运动 AI 点评**：每次训练结束或输入散步步数后，当前伙伴会用 AI 点评这次锻炼，显示在结算弹窗里。
-- **微信提醒**：`remind` 函数每天生成角色风格的运动提醒，通过 Server酱 推送到微信，并附上运动记录页链接。提醒会读取你在小游戏里记录的真实锻炼情况（锻炼次数、项目、连续天数），让船员像朋友一样聊到你的实际运动，而不是空喊口号。
+- **定时提醒**：`remind` 函数每天生成角色风格的运动提醒，通过企业微信群机器人推送到群，并附上运动记录页链接。提醒会读取你在小游戏里记录的真实锻炼情况（锻炼次数、项目、连续天数），让船员像朋友一样聊到你的实际运动，而不是空喊口号。
 - **锻炼记录**：每次在页面完成深蹲/挥拳训练或输入散步步数，`stats.js` 会自动保存记录，`remind` 函数据此生成个性化提醒。
 
 ## 部署步骤
@@ -28,7 +28,7 @@
 2. **关联 Netlify**：登录 [Netlify](https://app.netlify.com)，选择 “Add new site → Import an existing project”，关联你的 GitHub 仓库。Build command 和 Publish directory 都可以留空，`netlify.toml` 已配置好。
 3. **设置环境变量**：在 Netlify 站点 Settings → Environment variables 中添加：
    - `ZHIPU_API_KEY`：智谱开放平台创建的 API Key
-   - `SERVER_CHAN_KEY`：Server酱 的 SendKey（不需要微信提醒时可不设置）
+   - `WECOM_WEBHOOK_URL`：企业微信群机器人的 Webhook 地址（不需要群提醒时可不设置）
 4. **设置定时提醒**：在 [cron-job.org](https://cron-job.org) 创建**两个**定时任务（每天早上 07:00 和下午 13:00，时区选 `Asia/Shanghai`），URL 都填：
 
    ```
