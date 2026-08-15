@@ -7,7 +7,7 @@
  * 环境变量：ZHIPU_API_KEY、SERVER_CHAN_KEY
  */
 
-const { getStore } = require('@netlify/blobs');
+const { getStore, connectLambda } = require('@netlify/blobs');
 const { CREW } = require('./crew-data');
 
 const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
@@ -156,6 +156,9 @@ async function sendToWeChat(title, desp) {
 }
 
 exports.handler = async (event) => {
+  // Lambda compatibility mode 下手动接入 Blobs 环境（供 getExerciseStats 读取记录）
+  connectLambda(event);
+
   // 支持 GET（cron 定时触发 / 手动测试）和 POST
   if (event.httpMethod !== 'GET' && event.httpMethod !== 'POST') {
     return {

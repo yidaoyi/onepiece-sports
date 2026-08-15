@@ -4,7 +4,7 @@
  * GET：返回 Asa 的锻炼汇总（remind.js 生成个性化提醒时读取）
  */
 
-const { getStore } = require('@netlify/blobs');
+const { getStore, connectLambda } = require('@netlify/blobs');
 
 const STORE_NAME = 'exercise-stats';
 const KEY = 'asa-stats';
@@ -82,6 +82,8 @@ exports.handler = async (event) => {
   }
 
   try {
+    // Lambda compatibility mode 下不会自动注入 Blobs 运行环境，先手动接入当前请求
+    connectLambda(event);
     const store = getStore(STORE_NAME);
     const existing = (await store.get(KEY, { type: 'json' })) || { sessions: [] };
     const sessions = existing.sessions || [];
