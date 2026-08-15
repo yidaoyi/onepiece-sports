@@ -1,10 +1,10 @@
 /**
  * 定时运动提醒 Netlify Function
  * 每天选一位海贼王船员，用智谱 AI 生成该角色风格的运动提醒，
- * 再通过 Server酱 推送到微信。
+ * 再通过企业微信群机器人 推送到群。
  * 会读取 Asa 的锻炼记录（由 stats.js 写入 Netlify Blobs），
  * 让提醒内容更贴近真实锻炼情况（频率、项目、连续天数等）。
- * 环境变量：ZHIPU_API_KEY、SERVER_CHAN_KEY
+ * 环境变量：ZHIPU_API_KEY、WECOM_WEBHOOK_URL
  */
 
 const { getStore, connectLambda } = require('@netlify/blobs');
@@ -14,7 +14,7 @@ const ZHIPU_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
 const MODEL = 'glm-4-flash';
 
 const STATS_STORE = 'exercise-stats';
-const STATS_KEY = 'asa-stats';
+const STATS_KEY = '***';
 
 // 北京时间当前小时（Netlify 函数运行在 UTC，这里转成 UTC+8）
 function getBeijingHour(date = new Date()) {
@@ -120,7 +120,7 @@ async function generateReminder(crew, slot, statsLine) {
         { role: 'user', content: prompt },
       ],
       temperature: 0.9,
-      max_tokens: 100,
+      max_tokens: 150,
     }),
   });
 
@@ -133,24 +133,31 @@ async function generateReminder(crew, slot, statsLine) {
   if (!text) {
     throw new Error('智谱 API 返回空内容');
   }
-  return text.slice(0, 50);
+  return text.slice(0, 200);
 }
 
-// 通过 Server酱 推送微信
-async function sendToWeChat(title, desp) {
-  const key = process.env.SERVER_CHAN_KEY;
-  if (!key) {
-    throw new Error('缺少环境变量 SERVER_CHAN_KEY');
+// 通过企业微信群机器人推送
+async function sendToWeCom(title, content, siteUrl) {
+  const webhookUrl = process.env.WECOM_WEBHOOK_URL;
+  if (!webhookUrl) {
+    throw new Error('缺少环境变量 WECOM_WEBHOOK_URL');
   }
 
-  const resp = await fetch(`https://sctapi.ftqq.com/${key}.send`, {
+  const mdContent = `## ${title}
+${content}
+[📋 打开运动记录指针](${siteUrl})`;
+
+  const resp = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, desp }),
+    body: JSON.stringify({
+      msgtype: 'markdown',
+      markdown: { content: mdContent },
+    }),
   });
 
   if (!resp.ok) {
-    throw new Error(`Server酱 返回 ${resp.status}`);
+    throw new Error(`企业微信 返回 ${resp.status}`);
   }
   return resp.json();
 }
@@ -186,14 +193,9 @@ exports.handler = async (event) => {
   const title = `${crew.emoji} ${crew.name}喊你运动啦`;
   const siteUrl =
     process.env.URL || process.env.SITE_URL || 'https://onepiece-sports.netlify.app';
-  const desp = [
-    `**${reminder}**`,
-    '',
-    `[📋 打开运动记录指针](${siteUrl})`,
-  ].join('\n');
 
   try {
-    const result = await sendToWeChat(title, desp);
+    const result = await sendToWeCom(title, reminder, siteUrl);
     return {
       statusCode: 200,
       body: JSON.stringify({
@@ -207,7 +209,7 @@ exports.handler = async (event) => {
         aiUsed,
         statsLine,
         siteUrl,
-        serverChan: result,
+        wecom: result,
       }),
     };
   } catch (err) {
