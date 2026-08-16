@@ -52,6 +52,14 @@
 	        .theme-anime .res-item { flex: 1; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.6) 0, rgba(255,255,255,0.6) 4px, transparent 4px, transparent 8px), #f1f8e9; border: 3px solid #7cb342; border-radius: 4px; padding: 8px; text-align: center; color: #33691e; font-weight: bold; font-size: 12px; box-shadow: 3px 3px 0 #dcedc8; }
 	        .theme-anime .stats-panel { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 8px; }
 	        .theme-anime .stats-item { flex: 1; background: rgba(255, 255, 255, 0.72); border: 3px solid #0288d1; border-radius: 4px; padding: 7px 4px; text-align: center; color: #01579b; font-weight: bold; font-size: 11px; box-shadow: 3px 3px 0 #b3e5fc; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	        .theme-anime .goal-row { background: rgba(255, 255, 255, 0.72); border: 3px solid #e65100; border-radius: 4px; padding: 8px; margin-bottom: 16px; box-shadow: 3px 3px 0 #ffcc80; }
+	        .theme-anime .goal-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #bf360c; font-weight: bold; font-size: 12px; }
+	        .theme-anime .goal-btn { background: #e65100; color: #fff; border: none; width: 20px; height: 20px; border-radius: 4px; font-size: 14px; line-height: 1; cursor: pointer; }
+	        .theme-anime .goal-num { font-size: 15px; font-family: 'Press Start 2P', monospace; }
+	        .theme-anime .goal-count { margin-left: auto; }
+	        .theme-anime .goal-bar { height: 10px; background: #ffe0b2; border: 2px solid #e65100; border-radius: 5px; overflow: hidden; }
+	        .theme-anime .goal-fill { height: 100%; width: 0; background: #e65100; transition: width 0.4s; }
+	        .theme-anime .goal-msg { display: block; margin-top: 4px; font-size: 11px; color: #8d6e63; font-weight: bold; }
 	        .theme-anime .motion-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 	        .theme-anime .motion-btn { background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.3) 0, rgba(255,255,255,0.3) 2px, transparent 2px, transparent 6px), #ffecb3; border: 3px solid #ff8f00; border-radius: 4px; color: #bf360c; padding: 12px 4px; font-size: 12px; cursor: pointer; box-shadow: 3px 3px 0 #ff8f00; text-align: center; font-weight: bold; }
 	        .theme-anime .motion-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #ff8f00; }
@@ -97,6 +105,14 @@
 	        .theme-manga .res-item { flex: 1; background: #fff; border: 3px solid #000; border-radius: 0; padding: 8px; text-align: center; color: #000; font-weight: bold; font-size: 12px; box-shadow: 4px 4px 0 #000; }
 	        .theme-manga .stats-panel { display: flex; justify-content: space-between; margin-bottom: 16px; gap: 8px; }
 	        .theme-manga .stats-item { flex: 1; background: #fff; border: 3px solid #000; border-radius: 0; padding: 7px 4px; text-align: center; color: #000; font-weight: bold; font-size: 11px; box-shadow: 4px 4px 0 #000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+	        .theme-manga .goal-row { background: #fff; border: 3px solid #000; border-radius: 0; padding: 8px; margin-bottom: 16px; box-shadow: 4px 4px 0 #000; }
+	        .theme-manga .goal-head { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; color: #000; font-weight: bold; font-size: 12px; }
+	        .theme-manga .goal-btn { background: #000; color: #fff; border: none; width: 20px; height: 20px; font-size: 14px; line-height: 1; cursor: pointer; }
+	        .theme-manga .goal-num { font-size: 15px; font-family: 'Press Start 2P', monospace; }
+	        .theme-manga .goal-count { margin-left: auto; }
+	        .theme-manga .goal-bar { height: 10px; background: #fff; border: 2px solid #000; overflow: hidden; }
+	        .theme-manga .goal-fill { height: 100%; width: 0; background: #000; transition: width 0.4s; }
+	        .theme-manga .goal-msg { display: block; margin-top: 4px; font-size: 11px; color: #000; font-weight: bold; }
 	        .theme-manga .motion-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
 	        .theme-manga .motion-btn { background: #fff; border: 3px solid #000; border-radius: 0; color: #000; padding: 12px 4px; font-size: 12px; cursor: pointer; box-shadow: 4px 4px 0 #000; text-align: center; font-weight: bold; }
 	        .theme-manga .motion-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 #000; }
@@ -185,6 +201,17 @@
 	            <div class="stats-item">⛓️ 连续 <span id="statStreak">0</span> 天</div>
 	            <div class="stats-item">🏋️ <span id="statTypes">—</span></div>
 	        </div>
+	        <div class="goal-row" id="goalRow">
+	            <div class="goal-head">
+	                <text>🎯 本周目标</text>
+	                <button class="goal-btn" id="goalMinus" type="button">−</button>
+	                <span class="goal-num" id="goalValue">5</span>
+	                <button class="goal-btn" id="goalPlus" type="button">＋</button>
+	                <span class="goal-count" id="goalCount">0/5</span>
+	            </div>
+	            <div class="goal-bar"><div class="goal-fill" id="goalFill"></div></div>
+	            <text class="goal-msg" id="goalMsg">还没开始，先去修炼页练一组吧</text>
+	        </div>
 	        <div class="resources">
 	            <div class="res-item">⚡磁力: <span id="homeEnergy">0</span></div>
 	            <div class="res-item">📖日志: <span id="homeAlloy">0</span>/80</div>
@@ -263,6 +290,10 @@
 	        const CHAT_STORE_KEY = 'op_chat_history';
 	        const chatHistory = loadChatHistory();
 	        let chatBusy = false;
+	        let weeklyGoal = parseInt(localStorage.getItem('op_weekly_goal')) || 5;
+	        if (weeklyGoal < 1) weeklyGoal = 1;
+	        if (weeklyGoal > 10) weeklyGoal = 10;
+	        let lastWeeklyCount = 0;
 	        function loadChatHistory() {
 	            try {
 	                const raw = localStorage.getItem(CHAT_STORE_KEY);
@@ -524,16 +555,18 @@
 	                sendChat(v);
 	            }
 	        });
-	        function requestWorkoutComment(type, seconds, count) {
+	        function requestWorkoutComment(type, seconds, count, stats) {
 	            const typeName = { squat: '深蹲', punch: '挥拳', walk: '散步' }[type] || type;
 	            const c = crew[currentCrewIdx];
 	            const aiEl = $('resultAi');
 	            const timeText = seconds > 0 ? `用时${formatTime(seconds)}，` : '';
+	            const reachedGoal = stats && stats.weeklyCount >= weeklyGoal && lastWeeklyCount < weeklyGoal;
+	            const goalLine = reachedGoal ? ' 🎉 另外，Asa 刚刚达成了本周锻炼目标，请加一句热烈的祝贺。' : '';
 	            const key = crewKey();
 	            ensureChat();
 	            chatHistory[key].push({
 	                role: 'user',
-	                content: `我刚完成了一次锻炼：${typeName}，${timeText}动作${count}次。用你的风格真实地点评一下，50字以内，像朋友一样。`,
+	                content: `我刚完成了一次锻炼：${typeName}，${timeText}动作${count}次。用你的风格真实地点评一下，50字以内，像朋友一样。${goalLine}`,
 	            });
 	            saveChatHistory();
 	            aiEl.innerText = `${c.logo} ${c.name} 正在评价…`;
@@ -636,8 +669,9 @@
 	            $('resultTime').innerText = `用时：${formatTime(seconds)}`;
 	            $('resultAction').innerText = `动作次数：${stepCount} 次`;
 	            $('resultReward').innerText = `获得磁力：+${totalReward} ⚡`;
-	            reportWorkout(currentType, stepCount, seconds);
-	            requestWorkoutComment(currentType, seconds, stepCount);
+	            reportWorkout(currentType, stepCount, seconds)
+	                .then(() => loadStats())
+	                .then((stats) => requestWorkoutComment(currentType, seconds, stepCount, stats));
 	            $('resultModal').style.display = 'flex';
 	            feedbackMsg.innerText = `修炼结束！共获得 ${totalReward} ⚡`;
 	        });
@@ -656,14 +690,42 @@
 	        async function loadStats() {
 	            try {
 	                const resp = await fetch('/.netlify/functions/stats');
-	                if (!resp.ok) return;
+	                if (!resp.ok) return null;
 	                const data = await resp.json();
 	                const s = (data && data.stats) || {};
 	                $('statWeek').innerText = s.weeklyCount || 0;
 	                $('statStreak').innerText = s.streakDays || 0;
 	                $('statTypes').innerText = (s.typeNames || []).join('/') || '—';
-	            } catch (e) { /* 统计暂时读不到就保留旧数字 */ }
+	                lastWeeklyCount = s.weeklyCount || 0;
+	                updateGoalUI(lastWeeklyCount);
+	                return s;
+	            } catch (e) { /* 统计暂时读不到就保留旧数字 */ return null; }
 	        }
+	        function updateGoalUI(weeklyCount) {
+	            $('goalValue').innerText = weeklyGoal;
+	            const pct = Math.min(100, Math.round((weeklyCount / weeklyGoal) * 100));
+	            $('goalFill').style.width = pct + '%';
+	            $('goalCount').innerText = weeklyCount + '/' + weeklyGoal;
+	            let msg;
+	            if (weeklyCount === 0) msg = '还没开始，先去修炼页练一组吧';
+	            else if (weeklyCount < weeklyGoal) msg = '还差 ' + (weeklyGoal - weeklyCount) + ' 次达标，伙伴在等你';
+	            else msg = '🎉 目标达成！伙伴们发来贺电';
+	            $('goalMsg').innerText = msg;
+	        }
+	        $('goalMinus').addEventListener('click', () => {
+	            if (weeklyGoal > 1) {
+	                weeklyGoal--;
+	                localStorage.setItem('op_weekly_goal', weeklyGoal);
+	                updateGoalUI(lastWeeklyCount);
+	            }
+	        });
+	        $('goalPlus').addEventListener('click', () => {
+	            if (weeklyGoal < 10) {
+	                weeklyGoal++;
+	                localStorage.setItem('op_weekly_goal', weeklyGoal);
+	                updateGoalUI(lastWeeklyCount);
+	            }
+	        });
 	        function handleWalkInput() {
 	            let remaining = 500 - walkEnergyToday;
 	            if (remaining <= 0) { alert("今日散步磁力已刷满(500⚡)！"); return; }
@@ -678,8 +740,9 @@
 	            $('resultTime').innerText = `输入步数：${steps} 步`;
 	            $('resultAction').innerText = `汇率折算：10步 = 1⚡`;
 	            $('resultReward').innerText = `获得磁力：+${gainedEnergy} ⚡\n(今日剩余：${500 - walkEnergyToday}⚡)`;
-	            reportWorkout('walk', steps, 0);
-	            requestWorkoutComment('walk', 0, steps);
+	            reportWorkout('walk', steps, 0)
+	                .then(() => loadStats())
+	                .then((stats) => requestWorkoutComment('walk', 0, steps, stats));
 	            $('resultModal').style.display = 'flex';
 	        }
 	        window.closeModal = () => $('resultModal').style.display = 'none';
