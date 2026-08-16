@@ -12,6 +12,7 @@
 | `netlify/functions/remind.js` | 每日运动提醒（Server酱 推送微信，`/.netlify/functions/remind`） |
 | `netlify/functions/stats.js` | 锻炼记录存取（Netlify Blobs 持久化，`/.netlify/functions/stats`） |
 | `package.json` | 函数依赖声明（`@netlify/blobs` 用于存储锻炼记录） |
+| `manifest.webmanifest` + `sw.js` + `icon-*.png` | 手机"添加到主屏幕"所需的应用清单、离线缓存与图标 |
 
 ## 功能介绍
 
@@ -23,6 +24,7 @@
 - **锻炼记录**：每次在页面完成深蹲/挥拳训练或输入散步步数，`stats.js` 会自动保存记录，`remind` 函数据此生成个性化提醒。
 - **本周锻炼统计**：甲板页顶部显示本周练了几次、连续打卡几天、练过哪些项目，每次练完自动刷新。
 - **目标/成就系统**：甲板页可设置本周目标（1–10 次），进度条实时显示；达标那一刻，当前伙伴的点评会附上祝贺。
+- **像 App 一样用**：手机浏览器里"添加到主屏幕"后，点图标全屏打开，底部导航常驻，断网也能打开页面。
 
 ## 部署步骤
 
