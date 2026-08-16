@@ -260,8 +260,28 @@
 	        let timerInterval = null, seconds = 0, isRunning = false, stepCount = 0;
 	        let lastAccel = {x:0, y:0, z:0}, lastPeakTime = 0;
 	        let currentCrewIdx = 0;
-	        const chatHistory = {};
+	        const CHAT_STORE_KEY = 'op_chat_history';
+	        const chatHistory = loadChatHistory();
 	        let chatBusy = false;
+	        function loadChatHistory() {
+	            try {
+	                const raw = localStorage.getItem(CHAT_STORE_KEY);
+	                return raw ? JSON.parse(raw) : {};
+	            } catch (e) { return {}; }
+	        }
+	        function saveChatHistory() {
+	            try {
+	                const slim = {};
+	                Object.keys(chatHistory).forEach(key => {
+	                    const arr = chatHistory[key] || [];
+	                    if (arr.length) slim[key] = arr.slice(-30);
+	                });
+	                localStorage.setItem(CHAT_STORE_KEY, JSON.stringify(slim));
+	            } catch (e) {}
+	        }
+	        function crewKey() {
+	            return crew[currentCrewIdx].name;
+	        }
 	        let todayDate = new Date().toDateString();
 	        let walkDate = localStorage.getItem('op_walkDate');
 	        let walkEnergyToday = parseInt(localStorage.getItem('op_walkEnergy')) || 0;
@@ -424,12 +444,13 @@
 	            npcDialogue.innerText = crew[currentCrewIdx].line;
 	        });
 	        function ensureChat() {
-	            if (!chatHistory[currentCrewIdx]) chatHistory[currentCrewIdx] = [];
+	            const key = crewKey();
+	            if (!chatHistory[key]) chatHistory[key] = [];
 	        }
 	        function renderChat() {
 	            const box = $('chatMessages');
 	            box.innerHTML = '';
-	            (chatHistory[currentCrewIdx] || []).forEach(m => {
+	            (chatHistory[crewKey()] || []).forEach(m => {
 	                const div = document.createElement('div');
 	                div.className = 'chat-msg ' + (m.role === 'user' ? 'user' : 'bot');
 	                div.textContent = m.content;
@@ -441,9 +462,11 @@
 	            if (chatBusy) return;
 	            if (!text.trim()) return;
 	            chatBusy = true;
+	            const key = crewKey();
 	            ensureChat();
 	            if (!asGreeting) {
-	                chatHistory[currentCrewIdx].push({ role: 'user', content: text.trim() });
+	                chatHistory[key].push({ role: 'user', content: text.trim() });
+	                saveChatHistory();
 	                renderChat();
 	            }
 	            const typing = document.createElement('div');
@@ -457,17 +480,19 @@
 	                    headers: { 'Content-Type': 'application/json' },
 	                    body: JSON.stringify({
 	                        crew: crew[currentCrewIdx].name,
-	                        messages: chatHistory[currentCrewIdx],
+	                        messages: chatHistory[key],
 	                    }),
 	                });
 	                const data = await resp.json();
 	                const reply = data.reply || '（伙伴好像走神了，再试一次吧）';
-	                chatHistory[currentCrewIdx].push({ role: 'assistant', content: reply });
+	                chatHistory[key].push({ role: 'assistant', content: reply });
+	                saveChatHistory();
 	            } catch (e) {
-	                chatHistory[currentCrewIdx].push({
+	                chatHistory[key].push({
 	                    role: 'assistant',
 	                    content: '（信号不太好，伙伴没听清……稍后再试试）',
 	                });
+	                saveChatHistory();
 	            }
 	            chatBusy = false;
 	            renderChat();
@@ -477,8 +502,9 @@
 	            $('chatAvatar').innerText = c.logo;
 	            $('chatName').innerText = c.name;
 	            $('chatModal').style.display = 'flex';
-	            if (!chatHistory[currentCrewIdx]) {
-	                chatHistory[currentCrewIdx] = [];
+	            const key = crewKey();
+	            if (!chatHistory[key] || !chatHistory[key].length) {
+	                chatHistory[key] = [];
 	                sendChat('和Asa打个招呼吧，用你的风格，简短一点，50字以内。', true);
 	            } else {
 	                renderChat();
@@ -503,24 +529,27 @@
 	            const c = crew[currentCrewIdx];
 	            const aiEl = $('resultAi');
 	            const timeText = seconds > 0 ? `用时${formatTime(seconds)}，` : '';
+	            const key = crewKey();
 	            ensureChat();
-	            chatHistory[currentCrewIdx].push({
+	            chatHistory[key].push({
 	                role: 'user',
 	                content: `我刚完成了一次锻炼：${typeName}，${timeText}动作${count}次。用你的风格真实地点评一下，50字以内，像朋友一样。`,
 	            });
+	            saveChatHistory();
 	            aiEl.innerText = `${c.logo} ${c.name} 正在评价…`;
 	            fetch('/.netlify/functions/chat', {
 	                method: 'POST',
 	                headers: { 'Content-Type': 'application/json' },
 	                body: JSON.stringify({
 	                    crew: c.name,
-	                    messages: chatHistory[currentCrewIdx],
+	                    messages: chatHistory[key],
 	                }),
 	            })
 	            .then(r => r.json())
 	            .then(data => {
 	                const reply = data.reply || '（伙伴走神了）';
-	                chatHistory[currentCrewIdx].push({ role: 'assistant', content: reply });
+	                chatHistory[key].push({ role: 'assistant', content: reply });
+	                saveChatHistory();
 	                aiEl.innerText = `${c.logo} ${c.name}：${reply}`;
 	            })
 	            .catch(() => {
